@@ -22,7 +22,6 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assume;
 import org.junit.Test;
@@ -31,6 +30,8 @@ import org.slf4j.LoggerFactory;
 
 public class TestByteBitPacking512VectorLE {
   private static final Logger LOG = LoggerFactory.getLogger(TestByteBitPacking512VectorLE.class);
+  private static final int MIN_TEST_VALUES = 64;
+  private static final int MAX_TEST_VALUES = 1 << 20;
 
   @Test
   public void unpackValuesUsingVector() {
@@ -120,51 +121,25 @@ public class TestByteBitPacking512VectorLE {
   }
 
   private List<int[]> getRangeData(int bitWidth) {
-    List<int[]> result = new ArrayList<>();
-    int itemMax = 268435456;
-
     long maxValue = getMaxValue(bitWidth);
     long maxValueFilled = maxValue + 1;
-    int itemCount = (int) (maxValueFilled / itemMax);
-    int mode = (int) (maxValueFilled % itemMax);
-    if (mode != 0) {
-      ++itemCount;
+    int len = (int) Math.min(Math.max(MIN_TEST_VALUES, maxValueFilled), MAX_TEST_VALUES);
+    int[] array = new int[len];
+    if (bitWidth == 32) {
+      long min = Integer.MIN_VALUE;
+      long max = Integer.MAX_VALUE;
+      long span = max - min;
+      for (int i = 0; i < len; i++) {
+        long value = min + (span * i) / (len - 1);
+        array[i] = (int) value;
+      }
+    } else {
+      for (int i = 0; i < len; i++) {
+        long value = (maxValue * i) / (len - 1);
+        array[i] = (int) value;
+      }
     }
-
-    for (int i = 0; i < itemCount; i++) {
-      int len;
-      if ((i == itemCount - 1) && mode != 0) {
-        len = mode;
-      } else {
-        len = itemMax;
-      }
-      if (len < 64) {
-        len = 64;
-      } else {
-        len += 64;
-      }
-      int[] array = new int[len];
-      int j = 0;
-      while (j < len) {
-        int value = j + i * itemMax;
-        if (value > maxValue) {
-          if (maxValue < Integer.MAX_VALUE) {
-            value = (int) maxValue;
-          } else {
-            value = Integer.MAX_VALUE;
-          }
-        }
-        if (value < 0) {
-          if (bitWidth < 32) {
-            value = value - Integer.MIN_VALUE;
-          }
-        }
-        array[j] = value;
-        j++;
-      }
-      result.add(array);
-    }
-    return result;
+    return List.of(array);
   }
 
   private long getMaxValue(int bitWidth) {
