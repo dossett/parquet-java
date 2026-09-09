@@ -134,6 +134,7 @@
     <module>parquet-format-structures</module>
     <module>parquet-generator</module>
     <module>parquet-hadoop</module>
+    <module>parquet-hadoop-no-mapreduce-test</module>
     <module>parquet-jackson</module>
     <module>parquet-protobuf</module>
     <module>parquet-thrift</module>
@@ -632,6 +633,7 @@
               <excludeModule>parquet-cli</excludeModule>
               <excludeModule>parquet-tools-deprecated</excludeModule>
               <excludeModule>parquet-format-structures</excludeModule>
+              <excludeModule>parquet-hadoop-no-mapreduce-test</excludeModule>
 
               <!-- Excluding the following modules because bundles do not contain any java classes while they still fail the
                 compatibility check because of missing dependencies -->
