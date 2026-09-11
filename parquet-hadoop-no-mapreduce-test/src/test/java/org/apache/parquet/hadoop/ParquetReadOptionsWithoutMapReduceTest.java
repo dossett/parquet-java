@@ -23,6 +23,10 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.SimpleGroupFactory;
@@ -53,7 +57,7 @@ class ParquetReadOptionsWithoutMapReduceTest {
   
   @Test
   void canWriteAndReadFiles() throws IOException {
-      Path path = Files.createTempFile("sample", ".parquet");
+      Path path = Files.createTempDirectory("sample").resolve(java.util.UUID.randomUUID() + ".parquet");
       Configuration conf = new Configuration();
 
       PrimitiveType id = primitive(PrimitiveTypeName.INT32, Repetition.OPTIONAL).named("id");
